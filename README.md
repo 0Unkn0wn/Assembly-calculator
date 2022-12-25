@@ -186,7 +186,7 @@ When starting to write a program we assume that the stack is aligned to 16 bits.
 
 ## Simple Assembly Calculator
 
-The complete code can be found in the github repository : <www.pune-cacatu-aici.com>
+The complete code can be found in the github repository : <https://github.com/0Unkn0wn/Assembly-calculator>
 
 We begin by printing a message in the terminal with all available operations and how the program works.
 
