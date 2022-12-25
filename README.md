@@ -17,6 +17,7 @@ In this tutorial I will cover the basics of assembly on Linux x86-64 and how to 
   - [Calculator functions](#calculator-functions)
     - [Readoperator](#readoperator)
     - [Compute](#compute)
+- [Assembly current usage](#assembly-current-usage)
 
 ## Getting started
 
@@ -359,3 +360,17 @@ compute:
             xor rax,rax
       ret
 ```
+
+## Assembly current usage
+
+A few instances were assembly is still used in the current day :
+
+- Device drivers and interrupt handlers
+
+- Bootloaders
+
+- Embedded system applications where very precise timings are required
+
+- Some medical equipment
+
+- Some cryptographic algorithms
