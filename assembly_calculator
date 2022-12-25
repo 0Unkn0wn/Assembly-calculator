@@ -1,0 +1,156 @@
+;%include "io64.inc"
+bits 64
+default rel
+global main
+extern scanf
+extern printf
+extern putchar
+extern getchar
+extern puts
+
+section .data
+    message db "The following operations are available: +,-,*,/,^.Enter the first number hit enter,then the operation enter and the last number.", 10, 0
+    quit_message db "Press q to quit the program or press enter to continue." , 10 , 0
+    number_format   db '%lf', 0
+
+section .bss
+    firstnr   resq 1
+    secondnr   resq 1
+    
+section .text
+
+    main:
+        @while_input:
+            
+            mov rbp, rsp; for correct debugging
+            lea rdi , [message]
+            sub     rsp, 8
+            call puts
+            lea     rsi, [firstnr]     
+            lea     rdi, [number_format]             
+            mov     al, 0              
+            call    scanf
+            
+            call getchar
+            call readoperator
+            mov rbx,rax
+    
+            
+            lea     rsi, [secondnr]    
+            lea     rdi, [number_format]         
+            mov     al, 0                       
+            call    scanf
+                 
+         
+            movsd xmm0,[firstnr]
+            movsd xmm1,[secondnr]
+            mov rax,rbx
+            mov rdi,rax
+            call compute    
+            
+            
+            lea     rdi, [number_format]      
+            mov     al, 1                  
+            call    printf 
+            
+            mov rdi , 10
+            call putchar
+ 
+            lea rdi,[quit_message]
+            call puts
+            call getchar;;to clear the buffer
+            call getchar
+            add rsp,8
+            cmp rax,'q'
+            je @end_while_input
+            jmp @while_input
+            @end_while_input:
+                    
+            xor rax,rax        
+    ret
+    
+    compute:
+        cmp rdi,1
+            je @plus
+        cmp rdi,2
+            je @minus
+        cmp rdi,3
+            je @multiplication
+        cmp rdi,4
+            je @division  
+        cmp rdi,5
+            je @power  
+             
+        cmp rdi,0
+            je @bad
+             
+        @plus:
+            addsd xmm0,xmm1
+            ret
+        @minus:
+            subsd xmm0,xmm1
+            ret
+        @multiplication:
+            mulsd xmm0,xmm1
+            ret
+        @division:
+            divsd xmm0,xmm1
+            ret
+         @power:
+            movsd xmm2,xmm0
+            xor r12,r12
+            cvtsd2si r12,xmm1
+            @while_power:
+                cmp r12,1
+                    jbe @endpower
+                mulsd xmm0,xmm2
+                dec r12
+                jmp @while_power
+            @endpower:
+            ret
+        @bad:
+            xor rax,rax
+      ret
+ 
+ 
+ 
+    readoperator:
+    ;function that reads the operator and stores in rax a number which can be interpreted : 
+    ;0->invalid operand
+    ;1-> + operand
+    ;2-> - operand
+    ;3-> * operand
+    ;4-> / operand
+    ;5-> ^ operand
+        sub rsp,8
+        call getchar;getchar returns in al
+        add rsp,8
+        cmp al,'+'
+            jne @noplus
+        mov rax,1
+        ret
+        @noplus:
+        cmp al,'-'
+            jne @nominus
+        mov rax,2
+        ret
+        @nominus:
+        cmp al,'*'
+            jne @nomul
+        mov rax,3
+        ret
+        @nomul:
+        cmp al,'/'
+            jne @nodiv
+        mov rax,4
+        ret
+        @nodiv:
+        cmp al,'^'
+            jne @nopower
+        mov rax,5
+        ret
+        @nopower:
+        ;other operations can be added here
+        ;if the code reaches here it means that an invalid operation has been detected
+        mov rax,0;loading 0 in rax to show invalid operator
+     ret
